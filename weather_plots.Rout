@@ -1,0 +1,141 @@
+
+R version 3.0.2 (2013-09-25) -- "Frisbee Sailing"
+Copyright (C) 2013 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> # Multiple plot function
+> #
+> # ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
+> # - cols:   Number of columns in layout
+> # - layout: A matrix specifying the layout. If present, 'cols' is ignored.
+> #
+> # If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
+> # then plot 1 will go in the upper left, 2 will go in the upper right, and
+> # 3 will go all the way across the bottom.
+> #
+> multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
++   require(grid)
++   
++   # Make a list from the ... arguments and plotlist
++   plots <- c(list(...), plotlist)
++   
++   numPlots = length(plots)
++   
++   # If layout is NULL, then use 'cols' to determine layout
++   if (is.null(layout)) {
++     # Make the panel
++     # ncol: Number of columns of plots
++     # nrow: Number of rows needed, calculated from # of cols
++     layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
++                      ncol = cols, nrow = ceiling(numPlots/cols))
++   }
++   
++   if (numPlots==1) {
++     print(plots[[1]])
++     
++   } else {
++     # Set up the page
++     grid.newpage()
++     pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
++     
++     # Make each plot, in the correct location
++     for (i in 1:numPlots) {
++       # Get the i,j matrix positions of the regions that contain this subplot
++       matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
++       
++       print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
++                                       layout.pos.col = matchidx$col))
++     }
++   }
++ }
+> 
+> library(grid);library(ggplot2)
+> 
+> weather_daily <- read.csv("weather_daily.csv")
+> weather_daily$date = as.Date(as.character(weather_daily$date),"%Y-%m-%d")
+> weather_daily$boug = format(weather_daily$date, format="%b %d")           
+> 
+> weather_daily_recent = weather_daily[weather_daily$date >= Sys.Date(),]
+> weather_daily_recent$rain_adj <- NA
+> 
+> weather_daily_recent[weather_daily_recent$rain_in > 0,]$rain_adj <- weather_daily_recent[weather_daily_recent$rain_in > 0,]$high_f
+> 
+> p1 <- ggplot(data=weather_daily_recent[weather_daily_recent$city=='Washington',])+
++   geom_line(aes(x=boug,y=low_f,group=city,colour='Low'))+
++   geom_line(aes(x=boug,y=high_f,group=city,colour='High'))+
++   geom_point(aes(x=boug,y=rain_adj,group=city,colour='Rain',size=rain_in))+
++   scale_y_continuous(limits=c(min(weather_daily_recent$low_f)-10,max(weather_daily_recent$high_f)+10)
++                      ,breaks=seq(0,110,5))+
++   ggtitle('Upcoming Forecast for Washington DC')+
++   xlab("Date")+
++   ylab("Tempature")
+>   
+> p2 <- ggplot(data=weather_daily_recent[weather_daily_recent$city=='New_York',])+
++   geom_line(aes(x=boug,y=low_f,group=city,colour='Low'))+
++   geom_line(aes(x=boug,y=high_f,group=city,colour='High'))+
++   geom_point(aes(x=boug,y=rain_adj,group=city,colour='Rain',size=rain_in))+
++   scale_y_continuous(limits=c(min(weather_daily_recent$low_f)-10,max(weather_daily_recent$high_f)+10)
++                      ,breaks=seq(0,110,5))+
++   ggtitle('Upcoming Forecast for New York, NY')+
++   xlab("Date")+
++   ylab("Tempature")
+> 
+> p3 <- ggplot(data=weather_daily_recent[weather_daily_recent$city=='Liverpool',])+
++   geom_line(aes(x=boug,y=low_f,group=city,colour='Low'))+
++   geom_line(aes(x=boug,y=high_f,group=city,colour='High'))+
++   geom_point(aes(x=boug,y=rain_adj,group=city,colour='Rain',size=rain_in))+
++   scale_y_continuous(limits=c(min(weather_daily_recent$low_f)-10,max(weather_daily_recent$high_f)+10)
++                      ,breaks=seq(0,110,5))+
++   ggtitle('Upcoming Forecast for Liverpool, England')+
++   xlab("Date")+
++   ylab("Tempature")
+> 
+> p4 <- ggplot(data=weather_daily_recent[weather_daily_recent$city=='Sydney',])+
++   geom_line(aes(x=boug,y=low_f,group=city,colour='Low'))+
++   geom_line(aes(x=boug,y=high_f,group=city,colour='High'))+
++   geom_point(aes(x=boug,y=rain_adj,group=city,colour='Rain',size=rain_in))+
++   scale_y_continuous(limits=c(min(weather_daily_recent$low_f)-10,max(weather_daily_recent$high_f)+10)
++                      ,breaks=seq(0,110,5))+
++   ggtitle('Upcoming Forecast for Sydney, Australia')+
++   xlab("Date")+
++   ylab("Tempature")
+> 
+> p5 <- multiplot(p1, p2, p3, p4, cols=2)
+Warning messages:
+1: Removed 16 rows containing missing values (geom_point). 
+2: Removed 14 rows containing missing values (geom_point). 
+3: Removed 16 rows containing missing values (geom_point). 
+4: Removed 16 rows containing missing values (geom_point). 
+> 
+> 
+> png(paste('weather_daily_',Sys.Date(),'.png',sep=''),width =900,height =580)
+> multiplot(p1, p2, p3, p4, cols=2)
+Warning messages:
+1: Removed 16 rows containing missing values (geom_point). 
+2: Removed 14 rows containing missing values (geom_point). 
+3: Removed 16 rows containing missing values (geom_point). 
+4: Removed 16 rows containing missing values (geom_point). 
+> dev.off()
+pdf 
+  2 
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  5.266   0.151   5.409 
