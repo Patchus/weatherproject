@@ -43,6 +43,8 @@ for i in range(0,len(dailyread_df)):
         message += dailyread_df['city'][i].ljust(10)+' '+dailyread_df['high_c'][i].ljust(6)+dailyread_df['low_c'][i].ljust(4)+str(dailyread_df['rain_mm'][i])+'\n'+'\n'
 
 # Run the External Plotting Portion
+dailyread_df.to_csv('weather_daily.csv',headers=False)
+os.system('cat weather_daily.csv >> vintage_weather.csv')
 os.system('R CMD BATCH weather_plots.R')
 
 
