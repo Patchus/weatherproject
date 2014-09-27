@@ -69,4 +69,41 @@ server.login(str(sys.argv[1]), str(sys.argv[2]))
 text = msg.as_string()
 server.sendmail(fromaddr, toaddr, text)
 
-os.remove(pics[0]) 
+os.remove(pics[0])
+
+
+### Now create the .json for the webapp
+
+import pandas as pd
+from datetime import datetime as dt
+
+weather = pd.read_csv('weather_daily.csv')
+
+weather = pd.read_csv('weather_daily.csv')
+weather = weather[['city','date','high_f']].drop_duplicates()
+nycd = {}
+
+cities = weather['city'].drop_duplicates()
+
+for city in cities:
+    nycd[city] = list(weather['high_f'][weather['city']==city])
+    
+nycd['dates'] = []
+for date in list(weather['date'].drop_duplicates()[0:10]):
+    nycd['dates'].append(dt.strptime(date, "%Y-%m-%d"))
+
+nycd_df = pd.DataFrame(nycd)
+nycd_df.index = nycd_df.dates
+nycd_df = nycd_df.drop('dates',1)
+import vincent 
+#vincent.core.initialize_notebook()
+
+line = vincent.Line(nycd_df)
+line.axis_titles(x='Date', y='Tempature F')
+line.legend(title='Cities')
+line.scales[1].domain_max = max(nycd_df.max())+10
+line.scales[1].domain_min = min(nycd_df.min())-10
+line.scales[1].grammar()
+line.scales[1].zero = False
+line.to_json('/var/www/html/weather.json')
+ 

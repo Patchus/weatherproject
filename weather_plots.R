@@ -44,7 +44,7 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   }
 }
 
-library(grid);library(ggplot2)
+library(grid);library(ggplot2);library(scales)
 
 weather_daily <- read.csv("weather_daily.csv")
 weather_daily$date = as.Date(as.character(weather_daily$date),"%Y-%m-%d")
@@ -56,44 +56,49 @@ weather_daily_recent$rain_adj <- NA
 weather_daily_recent[weather_daily_recent$rain_in > 0,]$rain_adj <- weather_daily_recent[weather_daily_recent$rain_in > 0,]$high_f
 
 p1 <- ggplot(data=weather_daily_recent[weather_daily_recent$city=='Washington',])+
-  geom_line(aes(x=boug,y=low_f,group=city,colour='Low'))+
-  geom_line(aes(x=boug,y=high_f,group=city,colour='High'))+
-  geom_point(aes(x=boug,y=rain_adj,group=city,colour='Rain',size=rain_in))+
+  geom_line(aes(x=date,y=low_f,group=city,colour='Low'),stat='identity')+
+  geom_line(aes(x=date,y=high_f,group=city,colour='High'))+
+  geom_point(aes(x=date,y=rain_adj,group=city,colour='Rain',size=rain_in))+
   scale_y_continuous(limits=c(min(weather_daily_recent$low_f)-10,max(weather_daily_recent$high_f)+10)
                      ,breaks=seq(0,110,5))+
   ggtitle('Upcoming Forecast for Washington DC')+
   xlab("Date")+
-  ylab("Tempature")
-  
+  ylab("Tempature")+
+   scale_x_date(breaks = date_breaks('days'),labels = date_format("%b %d"))
+ 
 p2 <- ggplot(data=weather_daily_recent[weather_daily_recent$city=='New_York',])+
-  geom_line(aes(x=boug,y=low_f,group=city,colour='Low'))+
-  geom_line(aes(x=boug,y=high_f,group=city,colour='High'))+
-  geom_point(aes(x=boug,y=rain_adj,group=city,colour='Rain',size=rain_in))+
+  geom_line(aes(x=date,y=low_f,group=city,colour='Low'))+
+  geom_line(aes(x=date,y=high_f,group=city,colour='High'))+
+  geom_point(aes(x=date,y=rain_adj,group=city,colour='Rain',size=rain_in))+
   scale_y_continuous(limits=c(min(weather_daily_recent$low_f)-10,max(weather_daily_recent$high_f)+10)
                      ,breaks=seq(0,110,5))+
   ggtitle('Upcoming Forecast for New York, NY')+
   xlab("Date")+
-  ylab("Tempature")
+  ylab("Tempature")+
+  scale_x_date(breaks = date_breaks('days'),labels = date_format("%b %d"))
+
 
 p3 <- ggplot(data=weather_daily_recent[weather_daily_recent$city=='Liverpool',])+
-  geom_line(aes(x=boug,y=low_f,group=city,colour='Low'))+
-  geom_line(aes(x=boug,y=high_f,group=city,colour='High'))+
-  geom_point(aes(x=boug,y=rain_adj,group=city,colour='Rain',size=rain_in))+
+  geom_line(aes(x=date,y=low_f,group=city,colour='Low'))+
+  geom_line(aes(x=date,y=high_f,group=city,colour='High'))+
+  geom_point(aes(x=date,y=rain_adj,group=city,colour='Rain',size=rain_in))+
   scale_y_continuous(limits=c(min(weather_daily_recent$low_f)-10,max(weather_daily_recent$high_f)+10)
                      ,breaks=seq(0,110,5))+
   ggtitle('Upcoming Forecast for Liverpool, England')+
   xlab("Date")+
-  ylab("Tempature")
+  ylab("Tempature")+
+  scale_x_date(breaks = date_breaks('days'),labels = date_format("%b %d"))
 
 p4 <- ggplot(data=weather_daily_recent[weather_daily_recent$city=='Sydney',])+
-  geom_line(aes(x=boug,y=low_f,group=city,colour='Low'))+
-  geom_line(aes(x=boug,y=high_f,group=city,colour='High'))+
-  geom_point(aes(x=boug,y=rain_adj,group=city,colour='Rain',size=rain_in))+
+  geom_line(aes(x=date,y=low_f,group=city,colour='Low'))+
+  geom_line(aes(x=date,y=high_f,group=city,colour='High'))+
+  geom_point(aes(x=date,y=rain_adj,group=city,colour='Rain',size=rain_in))+
   scale_y_continuous(limits=c(min(weather_daily_recent$low_f)-10,max(weather_daily_recent$high_f)+10)
                      ,breaks=seq(0,110,5))+
   ggtitle('Upcoming Forecast for Sydney, Australia')+
   xlab("Date")+
-  ylab("Tempature")
+  ylab("Tempature")+
+  scale_x_date(breaks = date_breaks('days'),labels = date_format("%b %d"))
 
 p5 <- multiplot(p1, p2, p3, p4, cols=2)
 
