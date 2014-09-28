@@ -71,6 +71,29 @@ server.sendmail(fromaddr, toaddr, text)
 
 os.remove(pics[0])
 
+### Now adding the data to the database
+
+import psycopg2
+
+for city in daily_read:
+    con = psycopg2.connect(database='weather', user='root')
+    cur = con.cursor()
+    city['id'] = city['date']+city['As_of_date']+city['city']
+
+    
+    fields = ', '.join(city.keys())
+    values = []
+    for s in range(0,len(city.keys())):
+        values.append('%s')
+        
+    query = 'INSERT INTO weather (%s) VALUES (' % (fields)+' ,'.join(values)+');'
+    
+    try:
+        cur.execute(query,tuple(city.values()))
+    except:
+        pass
+    con.commit()
+    con.close()
 
 ### Now create the .json for the webapp
 
